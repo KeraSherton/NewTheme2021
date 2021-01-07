@@ -26,6 +26,12 @@
 			{% endfor %}
 		</select>
 
+    <!-- Variant swatches. -->
+    {% for option in product.options %}
+      {% include 'swatch' with option %}
+    {% endfor %}
+
+
     <!-- Custom properties. -->
     {% if product.metafields.properties.engraving %}
     <label for="properties[Engraving]">Engraved message (optional)</label>

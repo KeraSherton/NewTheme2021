@@ -12,7 +12,7 @@
   {{ 'normalize.css' | asset_url | stylesheet_tag }}
   {{ 'application.js' | asset_url | script_tag }}
 </head>
-<body>
+<body class="no-js">
 {% comment %} Menu {% endcomment %}
   {% for link in linklists.main-menu.links %}
     {% assign child_list_handle = link.title | handleize %}
@@ -48,6 +48,8 @@
       {{ 'option_selection.js' | shopify_asset_url | script_tag }}
     <script type="text/javascript">
       (function($) {
+        $('body').removeClass('no-js');
+        
         var onVariantSelected = function(variant, selector) {
            // Update price display.
           var formattedPrice = Shopify.formatMoney(variant.price, "");
@@ -64,13 +66,21 @@
         var optionSelectors= new Shopify.OptionSelectors("product-select", { product: {{ product | json }}, onVariantSelected: onVariantSelected,
           enableHistoryState: true
         });
-        
+
             //change image after click data-change tumb
         $(document).on('click', '[data-change-variant]', function(e){
           e.preventDefault();
           optionSelectors.selectVariant($(this).data('changeVariant'));
-        })
+        });
 
+         // Create an event listener to set a specific variant option when clicking on swatches.
+        $(document).on('click', '[data-change-option]', function(e) {
+          e.preventDefault();
+          var optionIndex = parseInt($(this).data('changeOption')), optionValue = $(this).data('changeValue');
+          if(optionSelectors.optionExistInSelect(optionSelectors.selectors[optionIndex].element, optionValue)) {
+            $(optionSelectors.selectors[optionIndex].element).val(optionValue).trigger('change');
+          }
+        });
 
       }(jQuery));
       </script>
